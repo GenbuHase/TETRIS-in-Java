@@ -1,73 +1,47 @@
 package io.genbuhase;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 
+/*
+ * 
+ * [TODO] ブロックの積み上げ機能
+ * [TODO] ブロックの回転機能
+ */
 public class TETRIS {
 	/** Canvasの幅 */
 	public static final int WIDTH = 10;
 	/** Canvasの高さ */
 	public static final int HEIGHT = 10;
 	
-	private static Canvas canvas = new Canvas(WIDTH, HEIGHT);
+	/** キャンバス */
+	protected static Canvas canvas = new Canvas(WIDTH, HEIGHT);
+	
+	/** 存在中のブロックを格納する配列 */
 	protected static ArrayList<Block> blocks = new ArrayList<>();
 	
 	
 	
 	public static void main (String[] args) {
-		/*Random randomizer = new Random();
+		Random randomizer = new Random();
 		
 		while (true) {
-			Block i = new Block.I();
-			Block o = new Block.O();
-			Block t = new Block.T();
-			Block j = new Block.J();
-			Block l = new Block.L();
-			Block s = new Block.S();
-			Block z = new Block.Z();
-			Block h = new Block.H();
-			
-			appendBlock(i, 1 + randomizer.nextInt(7), 1 + randomizer.nextInt(9));
-			i.drop();
-			
-			appendBlock(o, 1 + randomizer.nextInt(7), 1 + randomizer.nextInt(9));
-			o.drop();
-			
-			appendBlock(t, 1 + randomizer.nextInt(7), 1 + randomizer.nextInt(9));
-			t.drop();
-			
-			appendBlock(j, 1 + randomizer.nextInt(7), 1 + randomizer.nextInt(9));
-			j.drop();
-			
-			appendBlock(l, 1 + randomizer.nextInt(7), 1 + randomizer.nextInt(9));
-			l.drop();
-			
-			appendBlock(s, 1 + randomizer.nextInt(7), 1 + randomizer.nextInt(9));
-			s.drop();
-			
-			appendBlock(z, 1 + randomizer.nextInt(7), 1 + randomizer.nextInt(9));
-			z.drop();
-			
-			appendBlock(h, 1 + randomizer.nextInt(7), 1 + randomizer.nextInt(9));
-			h.drop();
-			
-			break;
-		}*/
-		
-		/*appendBlock(new Block.I(), 4, 4);
-		appendBlock(new Block.O(), 1, 1);
-		appendBlock(new Block.T(), 8, 1);
-		appendBlock(new Block.J(), 1, 5);
-		appendBlock(new Block.L(), 8, 5);
-		appendBlock(new Block.S(), 4, 6);
-		appendBlock(new Block.Z(), 4, 1);
-		appendBlock(new Block.H(), 8, 2);*/
-		
-		Block block = new Block.H();
-		appendBlock(block);
-		
-		handle(block);
+			if (blocks.isEmpty() || !blocks.getLast().isActive) {
+				try {
+					Block block = Block.generateRandomBlock();
+					appendBlock(block, randomizer.nextInt(1, WIDTH + 1), HEIGHT);
+					
+					handleBlock(block);
+				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | SecurityException | InvocationTargetException | NoSuchMethodException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
+	
+	
 	
 	/**
 	 * 指定されたブロックを追加する
@@ -77,7 +51,7 @@ public class TETRIS {
 	public static void appendBlock (Block block) {
 		blocks.add(block);
 		
-		canvas.init();
+		canvas.draw();
 	}
 	
 	/**
@@ -91,7 +65,18 @@ public class TETRIS {
 		blocks.add(block);
 		block.moveTo(x, y);
 		
-		canvas.init();
+		canvas.draw();
+	}
+	
+	/**
+	 * 指定されたブロックを消去する
+	 * 
+	 * @param block		消去するブロック
+	 */
+	public static void dismissBlock (Block block) {
+		blocks.remove(block);
+		
+		canvas.draw();
 	}
 	
 	/**
@@ -99,40 +84,46 @@ public class TETRIS {
 	 * 
 	 * @param block		操作するブロック
 	 */
-	public static void handle (Block block) {
+	public static void handleBlock (Block block) {
+		Random randomizer = new Random();
 		Scanner input = new Scanner(System.in);
 		
 		while (true) {
+			if (!block.isSticked()) {
+				block.isActive = false;
+				break;
+			}
+			
 			String str = input.next();
 			
 			switch (str) {
 				case "w":				// ↑
 					block.move(0, 1);
-					canvas.init();
+					canvas.draw();
 					
 					break;
 					
 				case "s":				// ↓
 					block.move(0, -1);
-					canvas.init();
+					canvas.draw();
 					
 					break;
 					
 				case "a":				// ←
 					block.move(-1, 0);
-					canvas.init();
+					canvas.draw();
 					
 					break;
 					
 				case "d":				// →
 					block.move(1, 0);
-					canvas.init();
+					canvas.draw();
 					
 					break;
 					
 				case "D":				// 落下
 					block.drop();
-					canvas.init();
+					canvas.draw();
 					
 					break;
 					
@@ -140,7 +131,19 @@ public class TETRIS {
 					block.rotate();
 					System.out.println(block.direction);
 					
-					canvas.init();
+					canvas.draw();
+					break;
+					
+				case "R":				// ランダム移動
+					block.moveTo(randomizer.nextInt(1, 11), randomizer.nextInt(1, 11));
+					
+					canvas.draw();
+					break;
+					
+				case "q":				// 終了
+					input.close();
+					
+					System.exit(0);
 					break;
 					
 				default:

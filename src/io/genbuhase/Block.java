@@ -1,5 +1,8 @@
 package io.genbuhase;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.Random;
+
 public class Block {
 	public static class I extends Block {
 		I () {
@@ -70,33 +73,131 @@ public class Block {
 		}
 	}
 	
+	public static class Opt1 extends Block {
+		Opt1 () {
+			super(
+				"***",
+				"***"
+			);
+		}
+	}
+	
+	public static class Opt2 extends Block {
+		Opt2 () {
+			super(
+				"***",	
+				"***",
+				"***"
+			);
+		}
+	}
+	
 	
 	
 	/**
 	 * ブロックの形状
 	 */
-	private String[] shape;
+	public final String[] shape;
 	
 	/**
-	 * 描画用に変換したshape
+	 * 描画可能なshape
 	 */
-	private String[] drawableShape;
+	public final String[] drawableShape;
+	
+	/**
+	 * ブロックの幅
+	 */
+	public final int width;
+	
+	/**
+	 * ブロックの高さ
+	 */
+	public final int height;
+	
+	
 	
 	/**
 	 * ブロックの位置(左下を(1, 1)、右上を(10, 10)とする)
 	 */
-	private int[] pos = { 1, 1 };
+	private Position pos = new Position(1, 1);
 	
 	/**
 	 * ブロックの向いている方向(北: 0, 東: 1, 南: 2, 西: 3)
 	 */
 	public int direction = 0;
 	
+	/**
+	 * ブロックの活性化状態
+	 */
+	public boolean isActive = true;
 	
 	
-	Block (String... shape) {
+	
+	/**
+	 * 
+	 * @param shape		ブロックの形状
+	 */
+	public Block (String... shape) {
 		this.shape = shape;
 		this.drawableShape = Block.toDrawable(shape);
+		
+		this.width = this.__getWidth();
+		this.height = this.__getHeight();
+	}
+	
+	
+		
+	private int __getWidth () {
+		int width = 0;
+		
+		for (String row : shape) {
+			if (width < row.length()) width = row.length();
+		}
+		
+		return width;
+	}
+	
+	private int __getHeight () {
+		return shape.length;
+	}
+	
+	
+
+	public Position getPos () {
+		return pos;
+	}
+	
+	public void setPos (int[] pos) {
+		if (!(pos.length == 1 || pos.length == 2)) {
+			throw new IllegalArgumentException();
+		}
+		
+		this.setPos(pos[0], pos[1]);
+	}
+	
+	public void setPos (int x, int y) {
+		this.setPosX(x);
+		this.setPosY(y);
+	}
+	
+	public void setPosX (int x) {
+		if (x < 1) {
+			pos.x = 1;
+		} else if (TETRIS.WIDTH < x + this.width - 1) {
+			pos.x = TETRIS.WIDTH - this.width + 1;
+		} else {
+			pos.x = x;
+		}
+	}
+	
+	public void setPosY (int y) {
+		if (y < 1) {
+			pos.y = 1;
+		} else if (TETRIS.HEIGHT < y + this.height - 1) {
+			pos.y = TETRIS.HEIGHT - this.height + 1;
+		} else {
+			pos.y = y;
+		}
 	}
 	
 	
@@ -108,24 +209,59 @@ public class Block {
 	
 	
 	
+	/**
+	 * 指定された変位のぶんだけブロックを動かす
+	 * 
+	 * @param dx	x方向への変位
+	 * @param dy	y方向への変位
+	 */
 	public void move (int dx, int dy) {
-		this.pos[0] += dx;
-		this.pos[1] += dy;
+		Position pos = this.getPos();
+		
+		this.setPos(pos.x + dx, pos.y + dy);
 	}
 	
+	/**
+	 * 指定された座標にブロックを動かす
+	 * 
+	 * @param x		移動後のx座標
+	 * @param y		移動後のy座標
+	 */
 	public void moveTo (int x, int y) {
-		this.pos[0] = x;
-		this.pos[1] = y;
+		this.setPos(x, y);
 	}
 	
+	/**
+	 * ブロックを落下させる
+	 */
 	public void drop () {
-		this.pos[1] = 1;
+		this.setPosY(1);
 	}
 	
+	/**
+	 * ブロックを回転させる
+	 */
 	public void rotate () {
 		this.direction = (this.direction == 3 ? 0 : this.direction + 1);
 	}
 	
+	/**
+	 * 移動可能か否かを返す
+	 * 
+	 * @return
+	 */
+	public boolean isSticked () {
+		if (1 < pos.y) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * ブロックを描画する
+	 */
+	@Deprecated
 	public void draw () {
 		for (int col = shape.length - 1; col == 0; col--) {
 			
@@ -134,6 +270,33 @@ public class Block {
 		System.out.println(this.toString());
 	}
 	
+	
+	
+	/**
+	 * ブロックのインスタンスをランダムに返す
+	 * 
+	 * @return	ランダムなブロックのインスタンス
+	 * 
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
+	 * @throws InvocationTargetException
+	 * @throws NoSuchMethodException
+	 * @throws SecurityException
+	 */
+	public static Block generateRandomBlock () throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+		Random randomizer = new Random();
+		
+		BlockType[] blockTypes = BlockType.values();
+		return (Block) blockTypes[randomizer.nextInt(0, blockTypes.length)].getNewInstance();
+	}
+		
+	/**
+	 * 指定されたshapeを描画可能体にして返す
+	 * 
+	 * @param shape		ブロックの形状
+	 * @return			描画可能体に変換されたshape
+	 */
 	public static String[] toDrawable (String[] shape) {
 		String[] drawable = new String[shape.length];
 		
@@ -142,15 +305,5 @@ public class Block {
 		}
 		
 		return drawable;
-	}
-	
-	
-	
-	public String[] getDrawableShape () {
-		return drawableShape;
-	}
-
-	public int[] getPos () {
-		return pos;
 	}
 }
