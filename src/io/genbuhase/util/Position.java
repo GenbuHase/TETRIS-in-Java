@@ -1,4 +1,6 @@
-package io.genbuhase;
+package io.genbuhase.util;
+
+import io.genbuhase.TETRIS;
 
 /**
  * TETRIS座標系を取り扱うクラス
@@ -16,7 +18,7 @@ public class Position {
 	 * 
 	 * @param position { X座標, Y座標 }
 	 */
-	Position (int[] position) {
+	public Position (int[] position) {
 		this(position[0], position[1]);
 	}
 	
@@ -25,7 +27,7 @@ public class Position {
 	 * @param x			X座標
 	 * @param y			Y座標
 	 */
-	Position (int x, int y) {
+	public Position (int x, int y) {
 		this.x = x;
 		this.y = y;
 	}

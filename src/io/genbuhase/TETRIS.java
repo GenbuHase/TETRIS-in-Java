@@ -1,5 +1,6 @@
 package io.genbuhase;
 
+import io.genbuhase.block.Block;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Random;
@@ -25,6 +26,10 @@ public class TETRIS {
 	
 	
 	public static void main (String[] args) {
+		Test();
+		
+		
+		
 		Random randomizer = new Random();
 		
 		while (true) {
@@ -151,5 +156,11 @@ public class TETRIS {
 					break;
 			}
 		}
+	}
+	
+	
+	
+	public static void Test () {
+		
 	}
 }

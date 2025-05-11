@@ -1,4 +1,4 @@
-package io.genbuhase;
+package io.genbuhase.block;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -12,7 +12,9 @@ public enum BlockType {
 	Z(Block.Z.class),
 	H(Block.H.class),
 	Opt1(Block.Opt1.class),
-	Opt2(Block.Opt2.class);
+	Opt2(Block.Opt2.class),
+	Opt3(Block.Opt3.class),
+	Opt4(Block.Opt4.class);
 	
 	
 	
@@ -24,7 +26,7 @@ public enum BlockType {
 	 * 
 	 * @param classObj	各ブロックのクラス
 	 */
-	BlockType (Class<?> classObj) {
+	private BlockType (Class<?> classObj) {
 		this.__class = classObj;
 	}
 	

@@ -2,6 +2,9 @@ package io.genbuhase;
 
 import java.util.Arrays;
 
+import io.genbuhase.block.Block;
+import io.genbuhase.util.Position;
+
 public class Canvas {
 	/* 
 	 * (1,10)　　　　　　　　　　　　(10, 10)

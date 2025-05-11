@@ -1,17 +1,25 @@
-package io.genbuhase;
+package io.genbuhase.block;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Random;
 
+import io.genbuhase.TETRIS;
+import io.genbuhase.util.Position;
+
 public class Block {
 	public static class I extends Block {
-		I () {
-			super("****");
+		public I () {
+			super(
+				"    ",
+				"    ",
+				"    ",
+				"****"
+			);
 		}
 	}
 	
 	public static class O extends Block {
-		O () {
+		public O () {
 			super(
 				"**",
 				"**"
@@ -20,8 +28,9 @@ public class Block {
 	}
 	
 	public static class T extends Block {
-		T () {
+		public T () {
 			super(
+				"   ",
 				" * ",
 				"***"
 			);
@@ -29,8 +38,9 @@ public class Block {
 	}
 	
 	public static class J extends Block {
-		J () {
+		public J () {
 			super(
+				"   ",
 				"*  ",
 				"***"
 			);
@@ -38,8 +48,9 @@ public class Block {
 	}
 	
 	public static class L extends Block {
-		L () {
+		public L () {
 			super(
+				"   ",
 				"***",
 				"*  "
 			);
@@ -47,8 +58,9 @@ public class Block {
 	}
 	
 	public static class S extends Block {
-		S () {
+		public S () {
 			super(
+				"   ",
 				" **",
 				"** "
 			);
@@ -56,8 +68,9 @@ public class Block {
 	}
 	
 	public static class Z extends Block {
-		Z () {
+		public Z () {
 			super(
+				"   ",
 				"** ",
 				" **"
 			);
@@ -65,8 +78,9 @@ public class Block {
 	}
 	
 	public static class H extends Block {
-		H () {
+		public H () {
 			super(
+				"   ",
 				"***",
 				"* *"
 			);
@@ -74,8 +88,9 @@ public class Block {
 	}
 	
 	public static class Opt1 extends Block {
-		Opt1 () {
+		public Opt1 () {
 			super(
+				"   ",
 				"***",
 				"***"
 			);
@@ -83,11 +98,43 @@ public class Block {
 	}
 	
 	public static class Opt2 extends Block {
-		Opt2 () {
+		public Opt2 () {
 			super(
 				"***",	
 				"***",
 				"***"
+			);
+		}
+	}
+	
+	public static class Opt3 extends Block {
+		public Opt3 () {
+			super(
+				"* *",
+				" * ",
+				"* *"
+			);
+		}
+	}
+	
+	public static class Opt4 extends Block {
+		public Opt4 () {
+			super(
+				"*   ",
+				" *  ",
+				"  * ",
+				"   *"
+			);
+		}
+	}
+	
+	public static class Opt5 extends Block {
+		public Opt5 () {
+			super(
+				"*   ",
+				"            ",
+				"        ",
+				"   *            "
 			);
 		}
 	}
@@ -149,16 +196,50 @@ public class Block {
 		
 	private int __getWidth () {
 		int width = 0;
+		int sanitizedWidth = 0;
 		
-		for (String row : shape) {
-			if (width < row.length()) width = row.length();
+		String matchedAddress = "";
+		int[] matchedAddresses;
+		
+		for (String col : shape) {
+			if (width < col.length()) width = col.length();
 		}
+		
+		matchedAddresses = new int[width];
+		
+		for (String col : shape) {
+			for (int i = 0; i < col.length(); i++) {
+				if (col.charAt(i) == '*') matchedAddresses[i] = 1;
+			}
+		}
+		
+		for (int address : matchedAddresses) {
+			matchedAddress = matchedAddress.concat(Integer.toString(address));
+		}
+		
+		sanitizedWidth = matchedAddress.lastIndexOf("1") - matchedAddress.indexOf("1") + 1;
 		
 		return width;
 	}
 	
 	private int __getHeight () {
-		return shape.length;
+		int height = shape.length;
+		int sanitizedHeight = 0;
+		
+		String matchedAddress = "";
+		int[] matchedAddresses = new int[height];
+		
+		for (int col = 0; col < height; col++) {
+			if (shape[col].indexOf("*") != -1) matchedAddresses[col] = 1;
+		}
+		
+		for (int address : matchedAddresses) {
+			matchedAddress = matchedAddress.concat(Integer.toString(address));
+		}
+		
+		sanitizedHeight = matchedAddress.lastIndexOf("1") - matchedAddress.indexOf("1") + 1;
+		
+		return height;
 	}
 	
 	
@@ -271,6 +352,17 @@ public class Block {
 	}
 	
 	
+	
+	/**
+	 * 回転状況を反映したブロック形状を返す
+	 * 
+	 * @return	回転後のブロック形状
+	 */
+	public String[] getRotatedShape () {
+		String[] rotated = shape;
+		
+		return rotated;
+	}
 	
 	/**
 	 * ブロックのインスタンスをランダムに返す
