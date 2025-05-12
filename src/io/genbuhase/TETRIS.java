@@ -1,12 +1,15 @@
 package io.genbuhase;
 
-import io.genbuhase.block.Block;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
+import io.genbuhase.block.Block;
+import io.genbuhase.block.BlockManager;
+
 /*
+ * ブロック着地後はブロックとして保全する理由はない。
+ * 消去するときにブロック単位で消去するわけではない。
  * 
  * [TODO] ブロックの積み上げ機能
  * [TODO] ブロックの回転機能
@@ -18,10 +21,10 @@ public class TETRIS {
 	public static final int HEIGHT = 10;
 	
 	/** キャンバス */
-	protected static Canvas canvas = new Canvas(WIDTH, HEIGHT);
+	protected static Board board = new Board(WIDTH, HEIGHT);
 	
 	/** 存在中のブロックを格納する配列 */
-	protected static ArrayList<Block> blocks = new ArrayList<>();
+	protected static BlockManager blocks = new BlockManager(board);
 	
 	
 	
@@ -53,10 +56,11 @@ public class TETRIS {
 	 * 
 	 * @param block		追加するブロック
 	 */
+	@Deprecated
 	public static void appendBlock (Block block) {
 		blocks.add(block);
 		
-		canvas.draw();
+		board.draw();
 	}
 	
 	/**
@@ -66,11 +70,12 @@ public class TETRIS {
 	 * @param x			X座標
 	 * @param y			Y座標
 	 */
+	@Deprecated
 	public static void appendBlock (Block block, int x, int y) {
 		blocks.add(block);
 		block.moveTo(x, y);
 		
-		canvas.draw();
+		board.draw();
 	}
 	
 	/**
@@ -78,10 +83,11 @@ public class TETRIS {
 	 * 
 	 * @param block		消去するブロック
 	 */
+	@Deprecated
 	public static void dismissBlock (Block block) {
 		blocks.remove(block);
 		
-		canvas.draw();
+		board.draw();
 	}
 	
 	/**
@@ -89,6 +95,7 @@ public class TETRIS {
 	 * 
 	 * @param block		操作するブロック
 	 */
+	@Deprecated
 	public static void handleBlock (Block block) {
 		Random randomizer = new Random();
 		Scanner input = new Scanner(System.in);
@@ -104,45 +111,45 @@ public class TETRIS {
 			switch (str) {
 				case "w":				// ↑
 					block.move(0, 1);
-					canvas.draw();
+					board.draw();
 					
 					break;
 					
 				case "s":				// ↓
 					block.move(0, -1);
-					canvas.draw();
+					board.draw();
 					
 					break;
 					
 				case "a":				// ←
 					block.move(-1, 0);
-					canvas.draw();
+					board.draw();
 					
 					break;
 					
 				case "d":				// →
 					block.move(1, 0);
-					canvas.draw();
+					board.draw();
 					
 					break;
 					
 				case "D":				// 落下
 					block.drop();
-					canvas.draw();
+					board.draw();
 					
 					break;
 					
 				case "r":				// 回転
 					block.rotate();
-					System.out.println(block.direction);
+					System.out.println(block.rotationState);
 					
-					canvas.draw();
+					board.draw();
 					break;
 					
 				case "R":				// ランダム移動
 					block.moveTo(randomizer.nextInt(1, 11), randomizer.nextInt(1, 11));
 					
-					canvas.draw();
+					board.draw();
 					break;
 					
 				case "q":				// 終了

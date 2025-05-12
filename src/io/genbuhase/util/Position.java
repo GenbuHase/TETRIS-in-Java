@@ -34,6 +34,13 @@ public class Position {
 	
 	
 	
+	@Override
+	public String toString () {
+		return "(%d, %d)".formatted(x, y);
+	}
+	
+	
+	
 	/**
 	 * xとyをint型の配列にして返す
 	 * 

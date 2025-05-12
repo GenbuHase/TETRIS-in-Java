@@ -1,11 +1,15 @@
 package io.genbuhase.block;
 
+import io.genbuhase.TETRIS;
+import io.genbuhase.util.Position;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Random;
 
-import io.genbuhase.TETRIS;
-import io.genbuhase.util.Position;
-
+/*
+ * 回転するとposにブロックがない場合もある
+ * 
+ * [TODO] posと別でブロックの実体を管理したい
+ */
 public class Block {
 	public static class I extends Block {
 		public I () {
@@ -164,18 +168,22 @@ public class Block {
 	
 	
 	/**
-	 * ブロックの位置(左下を(1, 1)、右上を(10, 10)とする)
+	 * ブロックの基準位置(左下基準。左下を(1, 1)、右上を(10, 10)とする)
 	 */
 	private Position pos = new Position(1, 1);
+	
+	/** 現在のブロックの形状を相対座標で表す配列 */
+	private Position[] cells;
 	
 	/**
 	 * ブロックの向いている方向(北: 0, 東: 1, 南: 2, 西: 3)
 	 */
-	public int direction = 0;
+	public int rotationState = 0;
 	
 	/**
 	 * ブロックの活性化状態
 	 */
+	@Deprecated
 	public boolean isActive = true;
 	
 	
@@ -243,11 +251,13 @@ public class Block {
 	}
 	
 	
-
+	
+	@Deprecated
 	public Position getPos () {
 		return pos;
 	}
 	
+	@Deprecated
 	public void setPos (int[] pos) {
 		if (!(pos.length == 1 || pos.length == 2)) {
 			throw new IllegalArgumentException();
@@ -256,11 +266,13 @@ public class Block {
 		this.setPos(pos[0], pos[1]);
 	}
 	
+	@Deprecated
 	public void setPos (int x, int y) {
 		this.setPosX(x);
 		this.setPosY(y);
 	}
 	
+	@Deprecated
 	public void setPosX (int x) {
 		if (x < 1) {
 			pos.x = 1;
@@ -271,6 +283,7 @@ public class Block {
 		}
 	}
 	
+	@Deprecated
 	public void setPosY (int y) {
 		if (y < 1) {
 			pos.y = 1;
@@ -315,6 +328,7 @@ public class Block {
 	/**
 	 * ブロックを落下させる
 	 */
+	@Deprecated
 	public void drop () {
 		this.setPosY(1);
 	}
@@ -323,7 +337,7 @@ public class Block {
 	 * ブロックを回転させる
 	 */
 	public void rotate () {
-		this.direction = (this.direction == 3 ? 0 : this.direction + 1);
+		this.rotationState = (this.rotationState == 3 ? 0 : this.rotationState + 1);
 	}
 	
 	/**
@@ -331,6 +345,7 @@ public class Block {
 	 * 
 	 * @return
 	 */
+	@Deprecated
 	public boolean isSticked () {
 		if (1 < pos.y) {
 			return true;
@@ -358,7 +373,7 @@ public class Block {
 	 * 
 	 * @return	回転後のブロック形状
 	 */
-	public String[] getRotatedShape () {
+	public String[] getRotatedCells () {
 		String[] rotated = shape;
 		
 		return rotated;
@@ -376,6 +391,7 @@ public class Block {
 	 * @throws NoSuchMethodException
 	 * @throws SecurityException
 	 */
+	@Deprecated
 	public static Block generateRandomBlock () throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		Random randomizer = new Random();
 		
