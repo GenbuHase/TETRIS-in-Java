@@ -1,107 +1,111 @@
 package io.genbuhase;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Random;
 import java.util.Scanner;
 
-import io.genbuhase.block.Block;
 import io.genbuhase.block.BlockManager;
+import io.genbuhase.util.Color;
 
-/*
- * ブロック着地後はブロックとして保全する理由はない。
- * 消去するときにブロック単位で消去するわけではない。
- * 
- * [TODO] ブロックの積み上げ機能
- * [TODO] ブロックの回転機能
- */
 public class TETRIS {
-	/** Canvasの幅 */
-	public static final int WIDTH = 10;
-	/** Canvasの高さ */
-	public static final int HEIGHT = 10;
+	private static enum GameState { START, RUNNING, PAUSED, GAMEOVER }
 	
-	/** キャンバス */
-	protected static Board board = new Board(WIDTH, HEIGHT);
+	private static final int WIDTH = 10;
+	private static final int HEIGHT = 10;
 	
-	/** 存在中のブロックを格納する配列 */
-	protected static BlockManager blocks = new BlockManager(board);
+	private static final Board board = new Board(WIDTH, HEIGHT);
+	private static final BlockManager blockManager = new BlockManager(board);
 	
 	
 	
 	public static void main (String[] args) {
-		Test();
+		board.setCell(0, 0, Color.Green, '■');
+		board.setCell(1, 0, Color.Green, '■');
+		board.setCell(2, 0, Color.Green, '■');
+		board.setCell(2, 1, Color.Green, '■');
 		
+		board.render();
 		
+		return;
+	}
+	
+	
+	
+	public void start () {
 		
+	}
+	
+	public void pause () {
+		
+	}
+	
+	public void resume () {
+		
+	}
+	
+	public void gameover () {
+		
+	}
+	
+	public void reset () {
+		
+	}
+	
+	
+	
+	public void render () {
+		
+	}
+	
+	private void handleInput () {
 		Random randomizer = new Random();
+		Scanner keyboardScanner = new Scanner(System.in);
 		
 		while (true) {
-			if (blocks.isEmpty() || !blocks.getLast().isActive) {
-				try {
-					Block block = Block.generateRandomBlock();
-					appendBlock(block, randomizer.nextInt(1, WIDTH + 1), HEIGHT);
+			String input = keyboardScanner.next();
+			
+			switch (input) {
+				case "w":				// ↑
+					blockManager.moveBlock(0, 1);
+					break;
 					
-					handleBlock(block);
-				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | SecurityException | InvocationTargetException | NoSuchMethodException e) {
-					e.printStackTrace();
-				}
+				case "s":				// ↓
+					blockManager.moveBlock(0, -1);
+					break;
+					
+				case "a":				// ←
+					blockManager.moveBlock(-1, 0);
+					break;
+					
+				case "d":				// →
+					blockManager.moveBlock(1, 0);
+					break;
+					
+				case "D":				// 落下
+					blockManager.dropBlock();
+					break;
+					
+				case "r":				// 回転
+					blockManager.rotateBlock();
+					System.out.println(blockManager.getCurrentBlock());
+					
+					break;
+					
+				case "R":				// ランダム移動
+					blockManager.moveBlock(randomizer.nextInt(1, 11), randomizer.nextInt(1, 11));
+					break;
+					
+				case "q":				// 終了
+					keyboardScanner.close();
+					System.exit(0);
+					
+					break;
+					
+				default:
+					System.out.println("Input WASD");
+					break;
 			}
-		}
-	}
-	
-	
-	
-	/**
-	 * 指定されたブロックを追加する
-	 * 
-	 * @param block		追加するブロック
-	 */
-	@Deprecated
-	public static void appendBlock (Block block) {
-		blocks.add(block);
-		
-		board.draw();
-	}
-	
-	/**
-	 * 指定されたブロックを(x, y)に追加する
-	 * 
-	 * @param block		追加するブロック
-	 * @param x			X座標
-	 * @param y			Y座標
-	 */
-	@Deprecated
-	public static void appendBlock (Block block, int x, int y) {
-		blocks.add(block);
-		block.moveTo(x, y);
-		
-		board.draw();
-	}
-	
-	/**
-	 * 指定されたブロックを消去する
-	 * 
-	 * @param block		消去するブロック
-	 */
-	@Deprecated
-	public static void dismissBlock (Block block) {
-		blocks.remove(block);
-		
-		board.draw();
-	}
-	
-	/**
-	 * 指定されたブロックに対して操作を受け付ける
-	 * 
-	 * @param block		操作するブロック
-	 */
-	@Deprecated
-	public static void handleBlock (Block block) {
-		Random randomizer = new Random();
-		Scanner input = new Scanner(System.in);
-		
-		while (true) {
-			if (!block.isSticked()) {
+			
+			/*if (!block.isSticked()) {
 				block.isActive = false;
 				break;
 			}
@@ -161,13 +165,13 @@ public class TETRIS {
 				default:
 					System.out.println("Input WASD");
 					break;
-			}
+			}*/
 		}
 	}
 	
 	
 	
-	public static void Test () {
-		
+	private void __test () {
+		// Color.__printAllColors();
 	}
 }

@@ -1,19 +1,14 @@
 package io.genbuhase.block;
 
-import io.genbuhase.TETRIS;
-import io.genbuhase.util.Position;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Random;
+import io.genbuhase.util.Color;
+import java.util.Arrays;
 
-/*
- * 回転するとposにブロックがない場合もある
- * 
- * [TODO] posと別でブロックの実体を管理したい
- */
 public class Block {
 	public static class I extends Block {
 		public I () {
 			super(
+				Color.Cyan,
+				
 				"    ",
 				"    ",
 				"    ",
@@ -25,6 +20,8 @@ public class Block {
 	public static class O extends Block {
 		public O () {
 			super(
+				Color.Yellow,
+				
 				"**",
 				"**"
 			);
@@ -34,6 +31,8 @@ public class Block {
 	public static class T extends Block {
 		public T () {
 			super(
+				Color.Purple,
+				
 				"   ",
 				" * ",
 				"***"
@@ -41,9 +40,11 @@ public class Block {
 		}
 	}
 	
-	public static class J extends Block {
+	public static class J extends Block{
 		public J () {
 			super(
+				Color.Blue,
+				
 				"   ",
 				"*  ",
 				"***"
@@ -54,6 +55,8 @@ public class Block {
 	public static class L extends Block {
 		public L () {
 			super(
+				Color.Orange,
+				
 				"   ",
 				"***",
 				"*  "
@@ -64,6 +67,8 @@ public class Block {
 	public static class S extends Block {
 		public S () {
 			super(
+				Color.Green,
+				
 				"   ",
 				" **",
 				"** "
@@ -74,6 +79,8 @@ public class Block {
 	public static class Z extends Block {
 		public Z () {
 			super(
+				Color.Red,
+				
 				"   ",
 				"** ",
 				" **"
@@ -145,66 +152,74 @@ public class Block {
 	
 	
 	
-	/**
-	 * ブロックの形状
-	 */
-	public final String[] shape;
+	/** ブロックの色 */
+	private final Color color;
+	/** ブロックの未回転時の形状 */
+	private final String[] originalShape;
 	
-	/**
-	 * 描画可能なshape
-	 */
-	public final String[] drawableShape;
-	
-	/**
-	 * ブロックの幅
-	 */
-	public final int width;
-	
-	/**
-	 * ブロックの高さ
-	 */
-	public final int height;
+	/** X座標 */
+	private int x;
+	/** Y座標 */
+	private int y;
+	/** 幅 */
+	private int width;
+	/** 高さ */
+	private int height;
+	/** 回転状態 */
+	private int rotated;
+	/** 回転状態を考慮した形状 */
+	private String[] shape;
 	
 	
 	
-	/**
-	 * ブロックの基準位置(左下基準。左下を(1, 1)、右上を(10, 10)とする)
-	 */
-	private Position pos = new Position(1, 1);
+	private Block (String... shape) {
+		this(Color.Cyan, shape);
+	}
 	
-	/** 現在のブロックの形状を相対座標で表す配列 */
-	private Position[] cells;
-	
-	/**
-	 * ブロックの向いている方向(北: 0, 東: 1, 南: 2, 西: 3)
-	 */
-	public int rotationState = 0;
-	
-	/**
-	 * ブロックの活性化状態
-	 */
-	@Deprecated
-	public boolean isActive = true;
-	
-	
-	
-	/**
-	 * 
-	 * @param shape		ブロックの形状
-	 */
-	public Block (String... shape) {
-		this.shape = shape;
-		this.drawableShape = Block.toDrawable(shape);
+	private Block (Color color, String... shape) {
+		this.color = color;
+		this.originalShape = this.shape = shape;
 		
-		this.width = this.__getWidth();
-		this.height = this.__getHeight();
+		this.width = __getExactWidth();
+		this.height = __getExactHeight();
 	}
 	
 	
-		
-	private int __getWidth () {
+	
+	public Color getColor () {
+		return color;
+	}
+	
+	public int getX () {
+		return x;
+	}
+	
+	public int getY () {
+		return y;
+	}
+	
+	public int getWidth () {
+		return width;
+	}
+	
+	public int getHeight () {
+		return height;
+	}
+	
+	public String[] getCells () {
+		return shape;
+	}
+	
+	
+	
+	/**
+	 * ブロックの正確な幅を取得する
+	 * 
+	 * @return	正確な幅
+	 */
+	private int __getExactWidth () {
 		int width = 0;
-		int sanitizedWidth = 0;
+		int exactWidth = 0;
 		
 		String matchedAddress = "";
 		int[] matchedAddresses;
@@ -225,14 +240,19 @@ public class Block {
 			matchedAddress = matchedAddress.concat(Integer.toString(address));
 		}
 		
-		sanitizedWidth = matchedAddress.lastIndexOf("1") - matchedAddress.indexOf("1") + 1;
+		exactWidth = matchedAddress.lastIndexOf("1") - matchedAddress.indexOf("1") + 1;
 		
-		return width;
+		return exactWidth;
 	}
 	
-	private int __getHeight () {
+	/**
+	 * ブロックの正確な高さを取得する
+	 * 
+	 * @return	正確な高さ
+	 */
+	private int __getExactHeight () {
 		int height = shape.length;
-		int sanitizedHeight = 0;
+		int exactHeight = 0;
 		
 		String matchedAddress = "";
 		int[] matchedAddresses = new int[height];
@@ -245,173 +265,49 @@ public class Block {
 			matchedAddress = matchedAddress.concat(Integer.toString(address));
 		}
 		
-		sanitizedHeight = matchedAddress.lastIndexOf("1") - matchedAddress.indexOf("1") + 1;
+		exactHeight = matchedAddress.lastIndexOf("1") - matchedAddress.indexOf("1") + 1;
 		
-		return height;
-	}
-	
-	
-	
-	@Deprecated
-	public Position getPos () {
-		return pos;
-	}
-	
-	@Deprecated
-	public void setPos (int[] pos) {
-		if (!(pos.length == 1 || pos.length == 2)) {
-			throw new IllegalArgumentException();
-		}
-		
-		this.setPos(pos[0], pos[1]);
-	}
-	
-	@Deprecated
-	public void setPos (int x, int y) {
-		this.setPosX(x);
-		this.setPosY(y);
-	}
-	
-	@Deprecated
-	public void setPosX (int x) {
-		if (x < 1) {
-			pos.x = 1;
-		} else if (TETRIS.WIDTH < x + this.width - 1) {
-			pos.x = TETRIS.WIDTH - this.width + 1;
-		} else {
-			pos.x = x;
-		}
-	}
-	
-	@Deprecated
-	public void setPosY (int y) {
-		if (y < 1) {
-			pos.y = 1;
-		} else if (TETRIS.HEIGHT < y + this.height - 1) {
-			pos.y = TETRIS.HEIGHT - this.height + 1;
-		} else {
-			pos.y = y;
-		}
+		return exactHeight;
 	}
 	
 	
 	
 	@Override
 	public String toString () {
-		return String.join("\n", shape);
+		return String.format("Block [color=%s, shape=%s, x=%s, y=%s, width=%s, height=%s, rotated=%s, cells=%s]", color, Arrays.toString(shape), x, y, width, height, rotated, Arrays.toString(shape));
 	}
 	
 	
 	
 	/**
-	 * 指定された変位のぶんだけブロックを動かす
+	 * ブロックを指定されたマスだけ移動する
 	 * 
-	 * @param dx	x方向への変位
-	 * @param dy	y方向への変位
+	 * @param dx	X座標の変位
+	 * @param dy	Y座標の変位
 	 */
 	public void move (int dx, int dy) {
-		Position pos = this.getPos();
-		
-		this.setPos(pos.x + dx, pos.y + dy);
+		this.x += dx;
+		this.y += dy;
 	}
 	
 	/**
-	 * 指定された座標にブロックを動かす
+	 * ブロックを指定されたマスに移動する
 	 * 
-	 * @param x		移動後のx座標
-	 * @param y		移動後のy座標
+	 * @param x		X座標
+	 * @param y		Y座標
 	 */
 	public void moveTo (int x, int y) {
-		this.setPos(x, y);
+		this.x = x;
+		this.y = y;
 	}
 	
 	/**
-	 * ブロックを落下させる
-	 */
-	@Deprecated
-	public void drop () {
-		this.setPosY(1);
-	}
-	
-	/**
-	 * ブロックを回転させる
+	 * ブロックを時計回りに90°回転する
 	 */
 	public void rotate () {
-		this.rotationState = (this.rotationState == 3 ? 0 : this.rotationState + 1);
-	}
-	
-	/**
-	 * 移動可能か否かを返す
-	 * 
-	 * @return
-	 */
-	@Deprecated
-	public boolean isSticked () {
-		if (1 < pos.y) {
-			return true;
-		}
+		// [TODO] 回転処理の実装
 		
-		return false;
-	}
-	
-	/**
-	 * ブロックを描画する
-	 */
-	@Deprecated
-	public void draw () {
-		for (int col = shape.length - 1; col == 0; col--) {
-			
-		}
-		
-		System.out.println(this.toString());
-	}
-	
-	
-	
-	/**
-	 * 回転状況を反映したブロック形状を返す
-	 * 
-	 * @return	回転後のブロック形状
-	 */
-	public String[] getRotatedCells () {
-		String[] rotated = shape;
-		
-		return rotated;
-	}
-	
-	/**
-	 * ブロックのインスタンスをランダムに返す
-	 * 
-	 * @return	ランダムなブロックのインスタンス
-	 * 
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
-	 * @throws IllegalArgumentException
-	 * @throws InvocationTargetException
-	 * @throws NoSuchMethodException
-	 * @throws SecurityException
-	 */
-	@Deprecated
-	public static Block generateRandomBlock () throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-		Random randomizer = new Random();
-		
-		BlockType[] blockTypes = BlockType.values();
-		return (Block) blockTypes[randomizer.nextInt(0, blockTypes.length)].getNewInstance();
-	}
-		
-	/**
-	 * 指定されたshapeを描画可能体にして返す
-	 * 
-	 * @param shape		ブロックの形状
-	 * @return			描画可能体に変換されたshape
-	 */
-	public static String[] toDrawable (String[] shape) {
-		String[] drawable = new String[shape.length];
-		
-		for (int i = 0; i < shape.length; i++) {
-			drawable[i] = shape[i].replace(" ", "　").replace("*", "■");
-		}
-		
-		return drawable;
+		this.width = __getExactWidth();
+		this.height = __getExactHeight();
 	}
 }

@@ -18,13 +18,15 @@ public enum BlockType {
 	
 	
 	
+	public static BlockType[] values = BlockType.values();
+	
+	
+	
 	private Class<?> __class;
-	
-	
 	
 	/**
 	 * 
-	 * @param classObj	各ブロックのクラス
+	 * @param classObj	ブロッククラス
 	 */
 	private BlockType (Class<?> classObj) {
 		this.__class = classObj;
@@ -44,7 +46,7 @@ public enum BlockType {
 	 * @throws NoSuchMethodException
 	 * @throws SecurityException
 	 */
-	public Block getNewInstance () throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+	public Block newInstance () throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		return (Block) this.__class.getDeclaredConstructor().newInstance();
 	}
 	
@@ -56,6 +58,6 @@ public enum BlockType {
 	 * @return	BlockTypeの長さ
 	 */
 	public static int getLength () {
-		return BlockType.values().length;
+		return values.length;
 	}
 }

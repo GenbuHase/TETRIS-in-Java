@@ -1,11 +1,11 @@
 package io.genbuhase.util;
 
-import io.genbuhase.TETRIS;
+import io.genbuhase.TETRIS_old;
 
 /**
  * TETRIS座標系を取り扱うクラス
  */
-public class Position {
+public class Position_old {
 	/** TETRIS座標系におけるX座標 */
 	public int x;
 	
@@ -18,7 +18,7 @@ public class Position {
 	 * 
 	 * @param position { X座標, Y座標 }
 	 */
-	public Position (int[] position) {
+	public Position_old (int[] position) {
 		this(position[0], position[1]);
 	}
 	
@@ -27,7 +27,7 @@ public class Position {
 	 * @param x			X座標
 	 * @param y			Y座標
 	 */
-	public Position (int x, int y) {
+	public Position_old (int x, int y) {
 		this.x = x;
 		this.y = y;
 	}
@@ -61,7 +61,7 @@ public class Position {
 		int[] indexed = new int[2];
 		
 		indexed[1] = x;
-		indexed[0] = TETRIS.HEIGHT - y;
+		indexed[0] = TETRIS_old.HEIGHT - y;
 		
 		return indexed;
 	}
@@ -74,7 +74,7 @@ public class Position {
 	 * @param indexes
 	 * @return
 	 */
-	public static Position fromIndex (int[] indexes) {
+	public static Position_old fromIndex (int[] indexes) {
 		return fromIndex(indexes[0], indexes[1]);
 	}
 	
@@ -86,7 +86,7 @@ public class Position {
 	 * 
 	 * @return
 	 */
-	public static Position fromIndex (int col, int row) {
-		return new Position(row, TETRIS.HEIGHT - col);
+	public static Position_old fromIndex (int col, int row) {
+		return new Position_old(row, TETRIS_old.HEIGHT - col);
 	}
 }
