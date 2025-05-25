@@ -8,6 +8,7 @@ import io.genbuhase.block.BlockManager;
 public class TETRIS {
 	private static enum GameState { START, RUNNING, PAUSED, GAMEOVER }
 	
+	private static final TETRIS GAME = new TETRIS();
 	private static final int WIDTH = 10;
 	private static final int HEIGHT = 14;
 	
@@ -19,44 +20,17 @@ public class TETRIS {
 	
 	
 	public static void main (String[] args) {
-		new TETRIS();
+		GAME.start();
 	}
 	
 	
 	
-	TETRIS () {
+	/**
+	 * ゲームを開始する
+	 */
+	public void start () {
 		blockManager.spawnBlock();
 		
-		render();
-		
-		handleInput();
-	}
-	
-	
-	
-	public void start () {
-		
-	}
-	
-	public void pause () {
-		
-	}
-	
-	public void resume () {
-		
-	}
-	
-	public void gameover () {
-		isGameover = true;
-	}
-	
-	public void reset () {
-		
-	}
-	
-	
-	
-	public void render () {
 		new Thread(new Runnable() {	
 			@Override
 			public void run () {
@@ -64,16 +38,58 @@ public class TETRIS {
 					try {
 						Thread.sleep(250);
 						
-						board.render();
-						blockManager.render();
+						render();
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 				}
 			}
 		}).start();
+		
+		handleInput();
 	}
 	
+	/**
+	 * ゲームを一時中断する
+	 */
+	public void pause () {
+		
+	}
+	
+	/**
+	 * ゲームを再開する
+	 */
+	public void resume () {
+		
+	}
+	
+	/**
+	 * ゲームオーバー処理を行う
+	 */
+	public void gameover () {
+		isGameover = true;
+	}
+	
+	/**
+	 * ゲームをリセットする
+	 */
+	public void reset () {
+		
+	}
+	
+	
+	
+	/**
+	 * ゲームを描画する
+	 */
+	public void render () {
+		blockManager.render();
+		board.render();
+	}
+	
+	/**
+	 * ユーザーからの入力処理を行う
+	 */
 	private void handleInput () {
 		Random randomizer = new Random();
 		Scanner keyboardScanner = new Scanner(System.in);

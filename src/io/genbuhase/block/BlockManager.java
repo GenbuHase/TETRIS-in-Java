@@ -9,7 +9,9 @@ public class BlockManager {
 	private final Board board;
 	private final Random randomizer = new Random();
 	
+	/** 現在制御しているブロック */
 	private Block currentBlock;
+	/** 次に制御するブロック */
 	private Block nextBlock;
 	
 	
@@ -30,6 +32,9 @@ public class BlockManager {
 	
 	
 	
+	/**
+	 * 新たにブロックを召喚して割り当てる
+	 */
 	public void spawnBlock () {
 		if (nextBlock == null) {
 			nextBlock = generateBlockRandomly();
@@ -40,6 +45,14 @@ public class BlockManager {
 		nextBlock = generateBlockRandomly();
 	}
 	
+	/**
+	 * 現在制御中のブロックを指定した分だけ動かす
+	 * 
+	 * @param dx	X軸の変位
+	 * @param dy	Y軸の変位
+	 * 
+	 * @return		移動可能か否か
+	 */
 	public boolean moveBlock (int dx, int dy) {
 		// TODO: 移動可能判定の実装
 		currentBlock.move(dx, dy);
@@ -47,24 +60,44 @@ public class BlockManager {
 		return true;
 	}
 	
+	/**
+	 * 現在制御中のブロックを落下させる
+	 */
 	public void dropBlock () {
 		// TODO: for文でmoveBlock(0, -1)を繰り返す処理の実装
 	}
 	
+	/**
+	 * 現在制御中のブロックを回転させる
+	 * 
+	 * @return	回転可能か否か
+	 */
 	public boolean rotateBlock () {
 		currentBlock.rotate();
 		return true;
 	}
 	
+	/**
+	 * 現在制御中のブロックを固定する
+	 */
 	public void lockBlock () {
 		
 	}
 	
+	/**
+	 * ゲームオーバーか否か判定する
+	 * @return
+	 */
 	public boolean isGameover () {
 		return false;
 	}
 	
+	/**
+	 * 現在制御中のブロックをボードに描画する
+	 */
 	public void render () {
+		board.resetBlockGrid();
+		
 		String[] shape = currentBlock.getShape();
 		
 		for (int col = 0; col < shape.length; col++) {

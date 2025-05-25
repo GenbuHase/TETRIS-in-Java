@@ -71,10 +71,23 @@ public class Board {
 		blockGrid[index[0]][index[1]] = new Cell(color, ch);
 	}
 	
+	/**
+	 * 指定された座標にブロックがあるかどうか返す
+	 * 
+	 * @param x		X座標
+	 * @param y		Y座標
+	 * 
+	 * @return		ブロックがあるか否か
+	 */
 	public boolean isOccupied (int x, int y) {
-		return true;
+		return getCell(x, y).getValue() != ' ';
 	}
 	
+	/**
+	 * ブロックで埋められた行を消去する
+	 * 
+	 * @return	消去された行数
+	 */
 	public int clearLines () {
 		return 0;
 	}
@@ -120,7 +133,7 @@ public class Board {
 		for (int col = 0; col < blockGrid.length; col++) {
 			for (int row = 0; row < blockGrid[col].length; row++) {
 				if (blockGrid[col][row].getValue() == '*') {
-					System.out.println(blockGrid[col][row]);
+					outputGrid[col][row] = blockGrid[col][row];
 				}
 			}
 		}
@@ -171,10 +184,26 @@ public class Board {
 	
 	
 	
+	/**
+	 * 指定された添字を座標系に変換する
+	 * 
+	 * @param col	縦列添字
+	 * @param row	横列添字
+	 * 
+	 * @return		{ X座標, Y座標 }
+	 */
 	private int[] convertIndexToCoordinate (int col, int row) {
 		return new int[] { row, height - 1 - col };
 	}
 	
+	/**
+	 * 指定された座標を添字系に変換する
+	 * 
+	 * @param x		X座標
+	 * @param y		Y座標
+	 * 
+	 * @return		{ 縦列添字, 横列添字 }
+	 */
 	private int[] convertCoordinateToIndex (int x, int y) {
 		return new int[] { height - 1 - y, x };
 	}
