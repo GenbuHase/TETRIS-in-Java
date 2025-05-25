@@ -2,7 +2,7 @@ package io.genbuhase.util;
 
 public class Cell {
 	private Color color;
-	private char ch;
+	private char value;
 	
 	
 	
@@ -11,12 +11,22 @@ public class Cell {
 	}
 	
 	public Cell (Color color) {
-		this(color, '　');
+		this(color, ' ');
 	}
 	
-	public Cell (Color color, char ch) {
+	public Cell (char value) {
+		this(Color.Default, value);
+	}
+	
+	public Cell (Color color, char value) {
 		this.color = color;
-		this.ch = ch;
+		this.value = value;
+	}
+	
+	
+	
+	public char getValue () {
+		return value;
 	}
 	
 	
@@ -33,6 +43,6 @@ public class Cell {
 	}
 	
 	public String toDisplayableCharacter () {
-		return String.valueOf(ch).replace(" ", "　").replace("*", "■");
+		return String.valueOf(value).replace(" ", "　").replace("*", "■");
 	}
 }

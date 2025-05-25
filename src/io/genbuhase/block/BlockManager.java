@@ -31,27 +31,28 @@ public class BlockManager {
 	
 	
 	public void spawnBlock () {
+		if (nextBlock == null) {
+			nextBlock = generateBlockRandomly();
+		}
+		
 		currentBlock = nextBlock;
 		
-		try {
-			nextBlock = generateBlockRandomly();
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-			e.printStackTrace();
-		}
+		nextBlock = generateBlockRandomly();
 	}
 	
 	public boolean moveBlock (int dx, int dy) {
-		// [TODO] 移動可能判定の実装
+		// TODO: 移動可能判定の実装
 		currentBlock.move(dx, dy);
 		
 		return true;
 	}
 	
 	public void dropBlock () {
-		// [TODO] for文でmoveBlock(0, -1)を繰り返す処理の実装
+		// TODO: for文でmoveBlock(0, -1)を繰り返す処理の実装
 	}
 	
 	public boolean rotateBlock () {
+		currentBlock.rotate();
 		return true;
 	}
 	
@@ -61,6 +62,18 @@ public class BlockManager {
 	
 	public boolean isGameover () {
 		return false;
+	}
+	
+	public void render () {
+		String[] shape = currentBlock.getShape();
+		
+		for (int col = 0; col < shape.length; col++) {
+			for (int row = 0; row < shape[col].length(); row++) {
+				if (shape[col].charAt(row) != ' ') {
+					board.setCell(currentBlock.getX() + row, currentBlock.getY() + shape.length - 1 - col, currentBlock.getColor(), shape[col].charAt(row));
+				}
+			}
+		}
 	}
 	
 	
@@ -77,8 +90,24 @@ public class BlockManager {
 	 * @throws NoSuchMethodException
 	 * @throws SecurityException
 	 */
-	private Block generateBlockRandomly () throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
-		return BlockType.values[randomizer.nextInt(0, BlockType.getLength())].newInstance();
+	private Block generateBlockRandomly () {
+		try {
+			return BlockType.values[randomizer.nextInt(0, BlockType.getLength())].newInstance();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 	
 	private boolean isCollided (Block block, int x, int y, int rotated) {
